@@ -33,14 +33,12 @@ async function cachePerUser(req, res, next) {
     let old = res.json.bind(res);
     res.json = async (body) => {
         if(!cachedData) {
-            console.log('saving data to cache for', process.env.CACHE_PER_USER_TTL_SEC);
             await new Cache().set(CACHE_KEY, body, process.env.CACHE_PER_USER_TTL_SEC);
         }
         old(body);  
     };
 
     if(cachedData) {
-        console.log('--> cached data');
         return res.status(200).json(JSON.parse(cachedData));
     }
     next();
@@ -52,14 +50,12 @@ async function cachePerUri(req, res, next) {
     let old = res.json.bind(res);
     res.json = async (body) => {
         if(!cachedData) {
-            console.log('saving data to cache for', process.env.CACHE_PER_URI_TTL_SEC);
             await new Cache().set(CACHE_KEY, body, process.env.CACHE_PER_URI_TTL_SEC);
         }
         old(body);  
     };
 
     if(cachedData) {
-        console.log('--> cached data');
         return res.status(200).json(JSON.parse(cachedData));
     }
     next();
