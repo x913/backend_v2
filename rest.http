@@ -1,0 +1,44 @@
+GET http://127.0.0.1:3000/apiv2/servers
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZHZfaWQiOiJiMmMyMGQ0NC0zNmZlLTRhNDAtYWMyYi1jZDdkZDRkNDg2YzkiLCJ1aWQiOjE0MjM5MywiaWF0IjoxNjA0MDY5NDc2LCJleHAiOjE2MDQwNzMwNzYsImF1ZCI6ImIyYzIwZDQ0LTM2ZmUtNGE0MC1hYzJiLWNkN2RkNGQ0ODZjOSJ9.MUF6DJyTNsJy_exBZROhKFhmYbMZh4oAr6kf0n3j7Zs
+
+### FASTEST SERVER
+
+GET http://127.0.0.1:3000/apiv2/servers/fastest
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZHZfaWQiOiJiMmMyMGQ0NC0zNmZlLTRhNDAtYWMyYi1jZDdkZDRkNDg2YzkiLCJ1aWQiOjE0MjM5MywiaWF0IjoxNjA0MDY5NDc2LCJleHAiOjE2MDQwNzMwNzYsImF1ZCI6ImIyYzIwZDQ0LTM2ZmUtNGE0MC1hYzJiLWNkN2RkNGQ0ODZjOSJ9.MUF6DJyTNsJy_exBZROhKFhmYbMZh4oAr6kf0n3j7Zs
+
+### UPDATE REFERER
+POST http://127.0.0.1:3000/apiv2/referer/update
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZHZfaWQiOiJiMmMyMGQ0NC0zNmZlLTRhNDAtYWMyYi1jZDdkZDRkNDg2YzkiLCJ1aWQiOjE0MjM5MywiaWF0IjoxNjA0MDY5NDc2LCJleHAiOjE2MDQwNzMwNzYsImF1ZCI6ImIyYzIwZDQ0LTM2ZmUtNGE0MC1hYzJiLWNkN2RkNGQ0ODZjOSJ9.MUF6DJyTNsJy_exBZROhKFhmYbMZh4oAr6kf0n3j7Zs
+content-Type: application/json
+
+{
+    "referer": "test-value"
+}
+### ADD PURCHASE REQUEST
+POST http://127.0.0.1:3000/apiv2/purchases/add
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZHZfaWQiOiJiMmMyMGQ0NC0zNmZlLTRhNDAtYWMyYi1jZDdkZDRkNDg2YzkiLCJ1aWQiOjE0MjM5MywiaWF0IjoxNjA0MDU1NDUzLCJleHAiOjE2MDQwNTkwNTMsImF1ZCI6ImIyYzIwZDQ0LTM2ZmUtNGE0MC1hYzJiLWNkN2RkNGQ0ODZjOSJ9.PunLy-SiByCr_jA3rGwfScdiRUr9fiA2cnel7K_0GB8
+content-Type: application/json
+
+{
+    "token": "ddkkfdojfkbdjbecmfilclki.AO-J1OzCUFkkkr4503oRmxgtd_bNm8elfrW_PWWE0WXIBEoHorkK21Y0A7Nv59SD1Pe2CiM4Hc3hMvQ5KFIz3o0uOUx8QRX9VYWPmNOiDtLi-gLdlwei6vq4IXq2332ODSmmHUBsNtGe",
+    "sku": "subscription_1_mouth"
+}
+
+### Login route
+POST http://127.0.0.1:3000/apiv2/auth/login
+content-Type: application/json
+
+{
+    "adv_id": "b2c20d44-36fe-4a40-ac2b-cd7dd4d486c9",
+    "password": "53dd24419a57623d018f732ae6a782f0f042171cdce9fbf13126c0c5bf2c3cfb"
+}
+
+### Register route
+POST http://127.0.0.1:3000/apiv2/auth/register
+content-Type: application/json
+
+{
+    "adv_id": "b2c20d44-36fe-4a40-ac2b-cd7dd4d486c9",
+    "password": "53dd24419a57623d018f732ae6a782f0f042171cdce9fbf13126c0c5bf2c3cfb",
+    "sub_referrer": "adcash"
+}
