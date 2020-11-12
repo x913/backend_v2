@@ -10,19 +10,25 @@ const {
     cachePerUri, cachePerUser
 } = require("../helpers/redis_cache");
 
+
+
+const getContinent = (req) => {
+    let continent;
+    try {
+        const ip = get_ip(req);
+        const geodata = req.app.get('geo').country(ip.clientIp);
+        // const geodata = req.app.get('geo').country('45.77.246.136');
+        continent = geodata.continent.names.en
+    } catch(error) {
+        console.log(error.message);
+    }
+    return continent; 
+}
+
 router.get('/fastest', verifyAccessToken, cachePerUser, async(req, res, next) => {
     
     try {
-        let continent;
-
-        try {
-            const ip = get_ip(req);
-            const geodata = req.app.get('geo').country(ip.clientIp);
-            // const geodata = req.app.get('geo').country('45.77.246.136');
-            continent = geodata.continent.names.en
-        } catch(error) {
-            console.log(error.message);
-        }
+        let continent = getContinent(req);
         const fastestServers = await new Server().getFastest(continent);
         res.status(200).json(fastestServers);    
     } catch(error) {
@@ -33,8 +39,9 @@ router.get('/fastest', verifyAccessToken, cachePerUser, async(req, res, next) =>
 
 router.get('/', verifyAccessToken, cachePerUri, async(req, res, next) => {
     try {
+        let continent = getContinent(req);
         const server = new Server();
-        const allServers = await server.getAll();
+        const allServers = await server.getAll(continent);
         return res.status(200).json(allServers);  
     } catch(error) {
         next(createError.InternalServerError(error.message));

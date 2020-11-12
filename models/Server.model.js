@@ -19,6 +19,7 @@ function buildCountriesResponse(results) {
         if (!current) {
             objects.push({
                 country: result.country,
+                is_fastest: result.is_fastest,
                 iso3166_2: result.country2,
                 is_premium: result.is_premium,
                 flag: `/static/flags/${result.country2.toLowerCase()}.jpg`,
@@ -42,7 +43,7 @@ Server.prototype.getFastest = async function(continent) {
 
             [results] = await this.connection.query(
                 `select
-                    v.country, v.country2, v.is_premium, vs.protocol, vs.port, vs.ip
+                    v.country, v.country2, v.is_premium, vs.protocol, vs.port, vs.ip, 1 is_fastest
                 from
                     vpn_countries v
                 join vpn_servers vs
@@ -64,7 +65,7 @@ Server.prototype.getFastest = async function(continent) {
         // no results by continent or no continent - select all active and not premium
         [results] = await this.connection.query(
             `select
-                v.country, v.country2, v.is_premium, vs.protocol, vs.port, vs.ip
+                v.country, v.country2, v.is_premium, vs.protocol, vs.port, vs.ip, 1 is_fastest
             from
                 vpn_countries v
             join vpn_servers vs
@@ -90,13 +91,15 @@ Server.prototype.getFastest = async function(continent) {
 
 }
  
-Server.prototype.getAll = async function() {
+Server.prototype.getAll = async function(continent) {
     try {
         this.connection = await pool.getConnection();
 
         let [results] = await this.connection.query(
             `select
-                v.country, v.country2, v.is_premium, vs.protocol, vs.port, vs.ip
+                v.country, v.country2, 
+                v.is_premium, vs.protocol, vs.port, vs.ip,
+                case when v.continent = ? and v.is_premium = 0 then 1 else 0 end as is_fastest
             from
                 treevpn.vpn_servers vs
             join
@@ -104,7 +107,7 @@ Server.prototype.getAll = async function() {
             where
                 vs.active = 1
             order by
-                v.country`
+                v.country`, [continent]
         );
         
         let retVal = buildCountriesResponse(results);

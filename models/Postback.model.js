@@ -17,7 +17,7 @@ Postback.prototype.getPostbackByCountryIsoCode = async function (countryIsoCode)
             [userCountry]
         );
 
-        return results;
+        return results[0];
 
     } catch (error) {
         throw error;

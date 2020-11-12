@@ -4,13 +4,24 @@ require('dotenv').config();
 
 const client = require('./redis_connect');
 
+// should be 1 hour
+// const ACCESS_TOKEN_EXPIRE_IN = '60s';
+const ACCESS_TOKEN_EXPIRE_IN = '1h';
+
+// should be 1 year
+// const REFRESH_TOKEN_EXPIRE_IN = '30s'; 
+const REFRESH_TOKEN_EXPIRE_IN = '1y'; 
+
+const REDIS_TTL =  365 * 24 * 60 * 60;  // 1 year
+// const REDIS_TTL =  60;  // 1 year
+
 module.exports = {
     signAccessToken: (userRegistrationData) => {
         return new Promise((resolve, reject) => {
             const secret = process.env.ACCESS_TOKEN;
 
             const options = {
-                expiresIn: "1h",
+                expiresIn: ACCESS_TOKEN_EXPIRE_IN,
                 audience: userRegistrationData.adv_id
             };
             JWT.sign(userRegistrationData, secret, options, (err, token) => {
@@ -26,7 +37,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
            JWT.verify(refreshToken, process.env.REFRESH_TOKEN, (err, payload) => {
                 if(err)  {
-                    return reject(createError.Unauthorized(err));
+                    return reject(createError.Unauthorized(err.message));
                 }
                 const {adv_id, user_key, ip} = payload;
                 client.get(`${payload.adv_id}_token`, (err, result) => {
@@ -47,7 +58,7 @@ module.exports = {
         return new Promise((resolve, reject) => {
             const secret = process.env.REFRESH_TOKEN;
             const options = {
-                expiresIn: "1y",
+                expiresIn: REFRESH_TOKEN_EXPIRE_IN,
                 audience: userRegistrationData.adv_id
             };
             JWT.sign(userRegistrationData, secret, options, (err, token) => {
@@ -56,7 +67,7 @@ module.exports = {
                     return reject(createError.InternalServerError());
                 }
                 // 365 * 24 * 60 * 60 == 1 year
-                client.set(`${userRegistrationData.adv_id}_token`, token, 'EX', 365 * 24 * 60 * 60, (err, response) => {
+                client.set(`${userRegistrationData.adv_id}_token`, token, 'EX', REDIS_TTL, (err, response) => {
                     if(err) {
                         console.log(err.message);
                         return reject(createError.InternalServerError());

@@ -12,9 +12,9 @@ const userValidationSchema = Joi.object({
         Joi.string()
         .min(8)
         .lowercase()
+        .pattern(new RegExp('^[0-9a-f]+$'))
         .message('password validation error')
-        .required()
-        .pattern(new RegExp('^[0-9a-f]+$')),
+        .required(),
 
     ip: 
         Joi.string()

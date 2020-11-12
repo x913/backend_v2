@@ -33,7 +33,9 @@ async function cachePerUser(req, res, next) {
     let old = res.json.bind(res);
     res.json = async (body) => {
         if(!cachedData) {
-            await new Cache().set(CACHE_KEY, body, process.env.CACHE_PER_USER_TTL_SEC);
+            if(res.statusCode >= 200 && res.statusCode <= 300) {
+                await new Cache().set(CACHE_KEY, body, process.env.CACHE_PER_USER_TTL_SEC);
+            }
         }
         old(body);  
     };
@@ -50,7 +52,9 @@ async function cachePerUri(req, res, next) {
     let old = res.json.bind(res);
     res.json = async (body) => {
         if(!cachedData) {
-            await new Cache().set(CACHE_KEY, body, process.env.CACHE_PER_URI_TTL_SEC);
+            if(res.statusCode >= 200 && res.statusCode <= 300) {
+                await new Cache().set(CACHE_KEY, body, process.env.CACHE_PER_URI_TTL_SEC);
+            }
         }
         old(body);  
     };
@@ -61,7 +65,39 @@ async function cachePerUri(req, res, next) {
     next();
 }
 
+async function cacheOpenVpnLogin(req, res, next) {
+
+    const { adv_id, password } = req.body;
+    if(!adv_id) {
+        //console.log('no adv id in body');
+        next();
+    } else {
+        const CACHE_KEY = `${adv_id}_${password}_openvpn_login`;
+        const cachedData = await new Cache().get(CACHE_KEY);
+        let old = res.json.bind(res);
+        res.json = async (body) => {
+            if(!cachedData) {
+                
+                if(res.statusCode >= 200 && res.statusCode <= 300) {
+                    await new Cache().set(CACHE_KEY, body, process.env.CACHE_PER_LOGIN_TTL_SEC);
+                }
+            }
+            old(body);  
+        };
+    
+        if(cachedData) {
+            return res.status(200).json(JSON.parse(cachedData));
+        }
+        next();
+    }
+        
+
+
+}
+
 module.exports = {
+    Cache,
+    cacheOpenVpnLogin,
     cachePerUser,
     cachePerUri
 }

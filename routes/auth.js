@@ -5,6 +5,13 @@ const User = require('../models/User.model');
 const { signAccessToken, signRefreshToken, verifyAccessToken, verifyRefreshToken  } = require('../helpers/jwt_helper');
 const {userValidationSchema} = require('../helpers/validation_schema');
 const createError = require('http-errors');
+
+const {    
+    cacheOpenVpnLogin, Cache
+} = require("../helpers/redis_cache");
+
+// testing
+
 const client = require('../helpers/redis_connect');
 
 
@@ -22,13 +29,28 @@ router.post('/register', async(req, res, next) => {
     }
 });
 
+router.post('/openvpn_login', cacheOpenVpnLogin, async(req, res, next) => {
+
+    try {
+        //console.log('not cached yet');
+        let userLoginData = {...req.body, ip: get_ip(req).clientIp };
+        const user = new User(userLoginData);
+        const userId = await user.getUserId();
+        if(userId) {
+            res.status(200).json({ is_premium: userId.is_premium });
+        }
+    } catch(error) {
+        next(error);
+    }
+});
+
 router.post('/login', async(req, res, next) => {
     try {
         let userLoginData = {...req.body, ip: get_ip(req).clientIp };
         const user = new User(userLoginData);
         const userId = await user.getUserId();
         if(userId) {
-            userLoginData = { adv_id: userLoginData.adv_id, uid: userId };
+            userLoginData = { adv_id: userLoginData.adv_id, uid: userId.uid };
             const accessToken = await signAccessToken(userLoginData);
             const refreshToken = await signRefreshToken(userLoginData);
             res.status(200).json({payload: {accessToken, refreshToken}});
@@ -52,7 +74,7 @@ router.post('/refresh-token', async(req, res, next) => {
 
         res.status(200).json({payload: {accessToken, refreshToken}});
     } catch(error) {
-        //console.log(' -> ', error.message);
+        console.log(' -> ', error.message);
         next(error);
     }
 });
